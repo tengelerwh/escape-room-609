@@ -1,0 +1,52 @@
+#!/usr/bin/env bash
+
+# Copy .env to .env.local (if it doesn't exist)
+cp -n .env .env.local
+
+# Append CTN_UID/CTN_GID to .env.local (if they're missing)
+grep -Eqx "CTN_UID=.*" .env.local || echo "CTN_UID=1000" >> .env.local
+grep -Eqx "CTN_GID=.*" .env.local || echo "CTN_GID=1000" >> .env.local
+
+# Update CTN_UID/CTN_GID to uid/gid of YOUR user
+sed -Ei "s/^CTN_UID=.+\$/CTN_UID=$(id -u)/" .env.local
+sed -Ei "s/^CTN_GID=.+\$/CTN_GID=$(id -g)/" .env.local
+
+# Bring docker up
+docker/docker-compose up -d
+
+#
+# Setup database
+#
+dbName="room-609"
+dbContainerName="room-609-mariadb"
+dbRootPassword="NUsc2I8dn2FNJsO7E3HkzwO0o"
+dbUser="escape_user"
+dbPassword="Eyaj9HMqWqIVHi2DxIT5Y5W5K"
+
+echo "Setup the database ${dbName} in ${dbContainerName}"
+command="CREATE DATABASE IF NOT EXISTS \`${dbName}\` CHARACTER SET utf8 COLLATE utf8_unicode_520_ci;"
+docker exec ${dbContainerName} mysql -e "${command}"
+
+command="CREATE USER IF NOT EXISTS '${dbUser}'@'localhost' IDENTIFIED BY '${dbPassword}';
+  GRANT ALL PRIVILEGES ON \`${dbName}\`.* TO '${dbUser}'@'localhost' IDENTIFIED BY '${dbPassword}';
+  FLUSH PRIVILEGES;
+"
+docker exec ${dbContainerName} mysql -e "${command}"
+
+command="CREATE USER IF NOT EXISTS '${dbUser}'@'%' IDENTIFIED BY '${dbPassword}';
+  GRANT ALL PRIVILEGES ON \`${dbName}\`.* TO '${dbUser}'@'%' IDENTIFIED BY '${dbPassword}';
+  FLUSH PRIVILEGES;
+"
+docker exec ${dbContainerName} mysql -e "${command}"
+
+# Install composer packages
+bin/docker composer install --no-interaction --no-progress --no-scripts --no-suggest --optimize-autoloader
+
+# Run database migrations
+bin/docker bin/console doctrine:migrations:migrate --no-interaction
+bin/docker bin/console doctrine:migrations:migrate --env=test --no-interaction
+
+# Install NodeJs encore
+bin/docker yarn add @babel/preset-react --dev
+bin/docker yarn add react react-dom prop-types
+

@@ -1,0 +1,63 @@
+version: "3.7"
+
+services:
+  room-609-php-fpm:
+    container_name: ${APP_NAME}-php
+    build:
+      context: .
+      dockerfile: php/FPM.Buster.Dockerfile
+      args:
+        CTN_UID: ${CTN_UID:-0}
+        CTN_GID: ${CTN_GID:-0}
+        CTN_USR: www-data
+        CTN_GRP: www-data
+        CTN_HOME: /home/www-data
+    environment:
+      SSH_AUTH_SOCK: /home/www-data/.ssh_auth.sock
+      PHP_IDE_CONFIG: serverName=${APP_NAME}
+    depends_on:
+      - ${APP_NAME}-mariadb
+    volumes:
+      - ${SSH_AUTH_SOCK}:/home/www-data/.ssh_auth.sock
+      - ${HOME}/.composer/cache:/home/www-data/.composer/cache
+      - ..:/var/www/${APP_NAME}
+    working_dir: /var/www/${APP_NAME}
+    extra_hosts:
+      - host.docker.internal:host-gateway
+
+  room-609-nginx:
+    container_name: ${APP_NAME}-php-nginx
+    build:
+      context: .
+      dockerfile: nginx/Dockerfile
+    depends_on:
+      - ${APP_NAME}-php-fpm
+    ports:
+      - "8081:80"
+    volumes:
+      - ..:/var/www/${APP_NAME}
+    working_dir: /var/www/${APP_NAME}
+
+  room-609-mariadb:
+    container_name: ${APP_NAME}-mariadb
+    build:
+      context: .
+      dockerfile: mariadb/Dockerfile
+      args:
+        MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+    ports:
+      - "3307:3306"
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+      MYSQL_DATABASE: ${APP_NAME}
+    volumes:
+      - room_609_mariadb_data:/var/lib/mysql
+      - ../log/mariadb:/var/log
+
+networks:
+  default:
+    name: escape_room
+
+volumes:
+  room_609_mariadb_data:
+    driver: local

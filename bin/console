@@ -1,0 +1,2 @@
+#!/bin/sh
+php -dxdebug.mode=off console-org "$@"

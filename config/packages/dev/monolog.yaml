@@ -1,0 +1,19 @@
+monolog:
+    handlers:
+        main:
+            level: debug
+
+        sql:
+            level: debug
+
+        php:
+            level: debug
+
+        application:
+            level: debug
+
+#        deprecated:
+#            type: stream
+#            path: "%kernel.logs_dir%/deprecated.%kernel.environment%.log"
+#            level: warning
+#            channels: ["deprecated"]

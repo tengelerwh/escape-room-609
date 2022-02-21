@@ -1,0 +1,23 @@
+parameters:
+  schema_room:
+    room:
+      create:
+        type: object
+        required:
+          - name
+          - description
+          - timer
+        properties:
+          name:
+            type: string
+          description:
+            type: string
+          timer:
+            type: object
+            required:
+              - total_time
+            properties:
+              total_time:
+                type: string
+                pattern: '%match.time%'
+

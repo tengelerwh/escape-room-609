@@ -1,0 +1,39 @@
+monolog:
+    handlers:
+        main:
+            type: stream
+            path:  '%kernel.logs_dir%/%kernel.environment%.log'
+            level: warning
+            channels: ["!event", "!php", "!doctrine", "!deprecated", "!app"]
+
+        sql:
+            type: stream
+            path:  '%kernel.logs_dir%/sql.%kernel.environment%.log'
+            level: warning
+            channels: ["doctrine"]
+
+        # uncomment to get logging in your browser
+        # you may have to allow bigger header sizes in your Web server configuration
+        #firephp:
+        #    type: firephp
+        #    level: info
+        #chromephp:
+        #    type: chromephp
+        #    level: info
+        console:
+            type: console
+            process_psr_3_messages: false
+            channels: ["!event", "!doctrine", "!console", "!php", "!deprecated"]
+
+        php:
+            type: stream
+            path: "%kernel.logs_dir%/php.%kernel.environment%.log"
+            level: warning
+            channels: [ "php"]
+
+        application:
+            type: stream
+            path: "%kernel.logs_dir%/application.%kernel.environment%.log"
+            level: warning
+            channels: [ "app"]
+
