@@ -49,6 +49,14 @@ services:
     gameService:
         class: App\DomainModel\Game\GameService
         arguments:
-            - '@App\Infrastructure\Repository\EscapeRoomDatabaseRepository'
+            - '@App\Infrastructure\Repository\GameDatabaseRepository'
             - '@monolog.handler.application'
 
+    App\Infrastructure\ApiClient\EscapeRoomApiClient:
+        class:
+        autowire: true
+        autoconfigure: true
+        arguments:
+            $protocol: 'http'
+            $host: 'escape-room-api-php:8080'
+            $apiVersion: 'v1'
