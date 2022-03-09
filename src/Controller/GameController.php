@@ -9,11 +9,11 @@ use Symfony\Component\Routing\Annotation\Route;
 
 class GameController extends AbstractController
 {
-    #[Route('/', name: 'default')]
+    #[Route('/', name: 'home')]
     public function index(): Response
     {
-        return $this->render('default/index.html.twig', [
-            'controller_name' => 'DefaultController',
+        return $this->render('game/index.html.twig', [
+            'controller_name' => 'GameController',
         ]);
     }
 }
