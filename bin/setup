@@ -50,5 +50,6 @@ bin/docker bin/console doctrine:migrations:migrate --env=test --no-interaction -
 bin/docker yarn add @babel/preset-react --dev
 bin/docker yarn add react react-dom prop-types
 
-bin/docker yarn init
+# run init only once
+#bin/docker yarn init
 bin/docker yarn install
