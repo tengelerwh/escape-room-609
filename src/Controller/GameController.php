@@ -8,7 +8,6 @@ use Symfony\Component\Routing\Annotation\Route;
 
 class GameController extends AbstractController
 {
-//    #[Route('/', name: 'home')]
     /**
      * @Route(
      *     "/",
