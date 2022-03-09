@@ -5,15 +5,15 @@ declare(strict_types=1);
 namespace App\Infrastructure\Repository;
 
 use App\DomainModel\DomainObject;
-use App\DomainModel\EscapeRoom\EscapeRoom;
-use App\DomainModel\EscapeRoom\EscapeRoomRepositoryInterface;
+use App\DomainModel\Game\Game;
+use App\DomainModel\Game\GameRepositoryInterface;
 use App\DomainModel\ObjectId;
 use App\DomainModel\Uuid;
 use Doctrine\DBAL\Exception;
 
-class EscapeRoomDatabaseRepository extends DatabaseRepository implements EscapeRoomRepositoryInterface
+class GameDatabaseRepository extends DatabaseRepository implements GameRepositoryInterface
 {
-    private const TABLE = 'escape_room';
+    private const TABLE = 'game';
 
     /**
      * @param ObjectId $id
@@ -35,18 +35,18 @@ class EscapeRoomDatabaseRepository extends DatabaseRepository implements EscapeR
         return $this->mapToModel($result->fetchAssociative());
     }
 
-    public function save(EscapeRoom $escapeRoom): void
+    public function save(Game $game): void
     {
-        if (null === $escapeRoom->getId()) {
-            $this->insert($escapeRoom);
+        if (null === $game->getId()) {
+            $this->insert($game);
         } else {
-            $this->update($escapeRoom);
+            $this->update($game);
         }
     }
 
-    private function mapToModel($row): EscapeRoom
+    private function mapToModel($row): Game
     {
-        return EscapeRoom::create(
+        return Game::create(
             $row['uuid'],
             $row['name'],
             $row['description']
@@ -54,33 +54,33 @@ class EscapeRoomDatabaseRepository extends DatabaseRepository implements EscapeR
     }
 
     /**
-     * @param EscapeRoom $escapeRoom
+     * @param Game $game
      * @throws Exception
      */
-    private function insert(EscapeRoom $escapeRoom): void
+    private function insert(Game $game): void
     {
         $uuid = Uuid::create();
         $query = "INSERT INTO " . self::TABLE . " (uuid, name, description) VALUES (:uuid, :name, :description);";
         $statement = $this->getConnection()->prepare($query);
         $statement->bindValue('uuid', (string) $uuid->toString());
-        $statement->bindValue('name', $escapeRoom->getName());
-        $statement->bindValue('description', $escapeRoom->getDescription());
+        $statement->bindValue('name', $game->getName());
+        $statement->bindValue('description', $game->getDescription());
 
         $statement->executeQuery();
-        $escapeRoom->setId($uuid);
+        $game->setId($uuid);
     }
 
     /**
-     * @param EscapeRoom $escapeRoom
+     * @param Game $game
      * @throws Exception
      */
-    private function update(EscapeRoom $escapeRoom): void
+    private function update(Game $game): void
     {
         $query = "UPDATE " . self::TABLE . " SET name = :name, description = :description WHERE uuid = :uuid";
         $statement = $this->getConnection()->prepare($query);
-        $statement->bindValue('uuid', (string) $escapeRoom->getId());
-        $statement->bindValue('name', $escapeRoom->getName());
-        $statement->bindValue('description', $escapeRoom->getDescription());
+        $statement->bindValue('uuid', (string) $game->getId());
+        $statement->bindValue('name', $game->getName());
+        $statement->bindValue('description', $game->getDescription());
 
         $statement->executeQuery();
     }
