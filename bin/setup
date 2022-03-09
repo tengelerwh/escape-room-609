@@ -46,6 +46,10 @@ bin/docker composer install --no-interaction --no-progress --no-scripts --no-sug
 bin/docker bin/console doctrine:migrations:migrate --no-interaction
 bin/docker bin/console doctrine:migrations:migrate --env=test --no-interaction
 
+# NPM already installed in DockerFile
+#bin/docker npm install
+#bin/docker npm update
+
 # Install NodeJs encore
 bin/docker yarn add @babel/preset-react --dev
 bin/docker yarn add react react-dom prop-types
