@@ -21,5 +21,11 @@
         "prop-types": "^15.8.1",
         "react": "^17.0.2",
         "react-dom": "^17.0.2"
-    }
+    },
+    "name": "room-609",
+    "version": "1.0.0",
+    "description": "escape room 609",
+    "main": "index.js",
+    "repository": "https://github.com/tengelerwh/escape-room-609.git",
+    "author": "Wouter Tengeler"
 }
