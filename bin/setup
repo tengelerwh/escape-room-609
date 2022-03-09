@@ -54,3 +54,4 @@ bin/docker bin/console doctrine:migrations:migrate --env=test --no-interaction
 bin/docker yarn add @babel/preset-react --dev
 bin/docker yarn add react react-dom prop-types
 
+bin/docker yarn install
