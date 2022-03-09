@@ -11,4 +11,4 @@ wait_timeout    = 86400
 
 [mariadb]
 general_log = on
-general_log_file = /var/log/mysql.log
+general_log_file = /var/log/room-609-mysql.log
