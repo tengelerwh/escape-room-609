@@ -7,12 +7,11 @@ namespace App\Controller;
 use App\DomainModel\Authentication\AuthenticationService;
 use App\DomainModel\Game\GameService;
 use Psr\Log\LoggerInterface;
-use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 
-class GameController extends AbstractController
+class GameController extends BaseController
 {
     private GameService $gameService;
     private LoggerInterface $logger;
@@ -38,9 +37,10 @@ class GameController extends AbstractController
      */
     public function index(Request $request): Response
     {
+        $currentUrl = $this->generateUrl('home', $request->query->all());
         $clientAccessToken = $this->authenticationService->getClientAccessTokenFromRequest($request);
         if (false === $this->authenticationService->isloggedIn($clientAccessToken)) {
-            return $this->redirect($this->generateUrl('auth.login.form'));
+            return $this->renderLoginForm($currentUrl);
         }
 
         $game = $this->gameService->getCurrentGame();

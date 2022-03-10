@@ -4,12 +4,12 @@ declare(strict_types = 1);
 
 namespace App\Controller;
 
-use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\HttpFoundation\Response;
 
-class AuthController extends AbstractController
+class AuthController extends BaseController
 {
     /**
      * @Route(
@@ -18,26 +18,14 @@ class AuthController extends AbstractController
      *     methods={"POST"}
      *     )
      */
-    public function login(): JsonResponse
+    public function login(Request $request): JsonResponse
     {
+        $loginForm = $this->createForm('test');
+        $loginForm->handleRequest($request);
         return new JsonResponse(
             [
                 'token' => 'my_generated_token',
             ]
         );
-    }
-
-    /**
-     * @Route(
-     *     "/auth/login",
-     *     name="auth.login.form",
-     *     methods={"GET"}
-     *     )
-     */
-    public function loginForm(): Response
-    {
-        return $this->render('auth/login.html.twig', [
-            'controller_name' => 'AuthController',
-        ]);
     }
 }

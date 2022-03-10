@@ -1,19 +1,21 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Hello AuthController!{% endblock %}
+{% block title %}Login{% endblock %}
 
 {% block body %}
-<style>
-    .example-wrapper { margin: 1em auto; max-width: 800px; width: 95%; font: 18px/1.5 sans-serif; }
-    .example-wrapper code { background: #F5F5F5; padding: 2px 6px; }
-</style>
+    {% if error %}
+        <div>{{ error.messageKey|trans(error.messageData, 'security') }}</div>
+    {% endif %}
 
-<div class="example-wrapper">
-    <h1>Login</h1>
+    <form action="{{ path('auth.login') }}" method="post">
+        <label for="username">Email:</label>
+        <input type="text" id="username" name="_username" value="{{ lastUsername }}" placeholder="your.email@yourdomain.nl"/>
 
-    <ul>
-        <li>Your controller at <code><a href="{{ '/var/www/escape-room/src/Controller/AuthController.php'|file_link(0) }}">src/Controller/AuthController.php</a></code></li>
-        <li>Your template at <code><a href="{{ '/var/www/escape-room/templates/auth/login.html.twig'|file_link(0) }}">templates/auth/index.html.twig</a></code></li>
-    </ul>
-</div>
+        <label for="password">Password:</label>
+        <input type="password" id="password" name="_password"/>
+
+        <input type="hidden" name="_target_path" value="{{ redirect }}">
+
+        <button type="submit">login</button>
+    </form>
 {% endblock %}
