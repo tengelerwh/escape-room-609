@@ -58,5 +58,6 @@ services:
         autoconfigure: true
         arguments:
             $protocol: 'http'
-            $host: 'escape-room-api-php:8080'
+            $host: 'escape-room-api-nginx'
             $apiVersion: 'v1'
+            $port: 80

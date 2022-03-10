@@ -16,12 +16,14 @@ class EscapeRoomApiClient implements ApiClient
     private string $host;
     private string $apiVersion;
     private string $protocol;
+    private ?int $port;
 
-    public function __construct(string $protocol, string $host, string $apiVersion)
+    public function __construct(string $protocol, string $host, string $apiVersion, ?int $port = 80)
     {
         $this->host = $host;
         $this->apiVersion = trim($apiVersion, '/:');
         $this->protocol = trim($protocol, '/');
+        $this->port = $port;
     }
 
     public function getTimeLeft(Uuid $gameId): array
@@ -63,6 +65,7 @@ class EscapeRoomApiClient implements ApiClient
     private function getUrl(string $path): string
     {
         $path = ltrim($path,'/');
-        return $this->protocol . '://' . $this->host . '/api/' . $this->apiVersion . '/' . $path;
+        $port = ($this->port !== 80) ? ':' . $this->port : '';
+        return $this->protocol . '://' . $this->host . $port . '/api/' . $this->apiVersion . '/' . $path;
     }
 }
