@@ -16,14 +16,14 @@ class Uuid implements ObjectId, JsonSerializable
         $this->uuid = BaseUuid::fromString($uuid);
     }
 
-    public static function fromString(string $id): self
+    public static function fromString(string $id): static
     {
-        return new self($id);
+        return new static($id);
     }
 
-    public static function create(): self
+    public static function create(): static
     {
-        return new self((string) BaseUuid::v4());
+        return new static((string) BaseUuid::v4());
     }
 
     public function toString(): string
