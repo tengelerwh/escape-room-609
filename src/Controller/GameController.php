@@ -14,17 +14,14 @@ use Symfony\Component\Routing\Annotation\Route;
 class GameController extends BaseController
 {
     private GameService $gameService;
-    private LoggerInterface $logger;
-    private AuthenticationService $authenticationService;
 
     public function __construct(
         GameService $gameService,
         AuthenticationService $authenticationService,
         LoggerInterface $logger
     ) {
+        parent::__construct($authenticationService, $logger);
         $this->gameService = $gameService;
-        $this->logger = $logger;
-        $this->authenticationService = $authenticationService;
     }
 
     /**
@@ -39,7 +36,7 @@ class GameController extends BaseController
     {
         $currentUrl = $this->generateUrl('home', $request->query->all());
         $clientAccessToken = $this->authenticationService->getClientAccessTokenFromRequest($request);
-        if (false === $this->authenticationService->isloggedIn($clientAccessToken)) {
+        if (false === $this->authenticationService->isloggedIn()) {
             return $this->renderLoginForm($currentUrl);
         }
 

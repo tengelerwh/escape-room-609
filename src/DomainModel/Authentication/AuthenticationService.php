@@ -8,16 +8,18 @@ use Symfony\Component\HttpFoundation\Request;
 
 class AuthenticationService implements AuthenticationServiceInterface
 {
+    private ?ClientAccessToken $clientAccessToken = null;
 
     public function login(string $email, string $password): ?ClientAccessToken
     {
         //@todo call apiClient to handle login
-        return null;
+        $this->clientAccessToken = ClientAccessToken::create();
+        return $this->clientAccessToken;
     }
 
-    public function isLoggedIn(?ClientAccessToken $clientAccessToken): bool
+    public function isLoggedIn(): bool
     {
-        if (null === $clientAccessToken) {
+        if (null === $this->clientAccessToken) {
             return false;
         }
         return true;
@@ -28,6 +30,12 @@ class AuthenticationService implements AuthenticationServiceInterface
         if (false === $request->headers->has('X-ACCESS-TOKEN')) {
             return null;
         }
-        return ClientAccessToken::fromString($request->headers->get('X-ACCESS-TOKEN'));
+        $this->clientAccessToken = ClientAccessToken::fromString($request->headers->get('X-ACCESS-TOKEN'));
+        return $this->clientAccessToken;
+    }
+
+    public function getStoredClientAccessToken(): ?ClientAccessToken
+    {
+        return $this->clientAccessToken;
     }
 }
