@@ -9,4 +9,37 @@
 import './styles/app.css';
 
 // start the Stimulus application
-import './bootstrap';
+// import './bootstrap';
+
+import React from 'react';
+import ReactDOM from 'react-dom';
+
+
+class App extends React.Component {
+    constructor() {
+        super();
+
+        this.state = {
+            path: 'http://localhost:8081/api/v1/',
+            loggedIn: false
+        };
+    }
+
+    // componentDidMount() {
+    //     fetch(this.state.path + 'auth/login')
+    //         .then(response => response.json())
+    //         .then(loggedIn => {
+    //             this.setState({
+    //                 loggedIn
+    //             });
+    //         });
+    // }
+
+    render() {
+        return (
+            <div className="login">Login form</div>
+        );
+    }
+}
+
+ReactDOM.render(<App />, document.getElementById('root'));

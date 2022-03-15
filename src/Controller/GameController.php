@@ -35,13 +35,13 @@ class GameController extends BaseController
     public function index(Request $request): Response
     {
         $currentUrl = $this->generateUrl('home', $request->query->all());
-        $clientAccessToken = $this->authenticationService->getClientAccessTokenFromRequest($request);
-        if (false === $this->authenticationService->isloggedIn()) {
-            return $this->renderLoginForm($currentUrl);
-        }
-
-        $game = $this->gameService->getCurrentGame();
-        $timeLeft = $this->gameService->getTimeLeft($game);
+//        $clientAccessToken = $this->authenticationService->getClientAccessTokenFromRequest($request);
+//        if (false === $this->authenticationService->isloggedIn()) {
+//            return $this->renderLoginForm($currentUrl);
+//        }
+//
+//        $game = $this->gameService->getCurrentGame();
+//        $timeLeft = $this->gameService->getTimeLeft($game);
 
         return $this->render('game/index.html.twig', [
             'controller_name' => 'GameController',

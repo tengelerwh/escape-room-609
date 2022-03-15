@@ -63,6 +63,6 @@ Encore
     //.autoProvidejQuery()
 
 ;
-Encore.enableStimulusBridge('./assets/controllers.json');
+// Encore.enableStimulusBridge('./assets/controllers.json');
 
 module.exports = Encore.getWebpackConfig();
