@@ -33,7 +33,7 @@ services:
     depends_on:
       - ${APP_NAME}-php-fpm
     ports:
-      - "8081:80"
+      - "9081:80"
     volumes:
       - ..:/var/www/${APP_NAME}
     working_dir: /var/www/${APP_NAME}
