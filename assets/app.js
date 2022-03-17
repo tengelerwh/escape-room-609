@@ -13,31 +13,45 @@ import './styles/app.css';
 
 import React from 'react';
 import ReactDOM from 'react-dom';
-
+import LoginForm from './js/components/LoginForm';
+import User from './js/components/User';
 
 class App extends React.Component {
     constructor() {
         super();
 
         this.state = {
-            path: 'http://localhost:8081/api/v1/',
-            loggedIn: false
+            path: 'http://localhost:9081/',
+            auth: {
+                'token': null,
+                'loggedIn': false,
+                'name': ''
+            }
         };
+        this.login = this.login.bind(this);
     }
 
-    // componentDidMount() {
-    //     fetch(this.state.path + 'auth/login')
-    //         .then(response => response.json())
-    //         .then(loggedIn => {
-    //             this.setState({
-    //                 loggedIn
-    //             });
-    //         });
-    // }
+    componentDidMount() {
+        // fetch(this.state.path + 'auth/login')
+        //     .then(response => response.json())
+        //     .then(authData => {
+        //         this.setState({auth: authData});
+        //     });
+    }
+
+    login(data) {
+        console.log('App login data returned' + data.name);
+        this.setState({auth: data});
+    }
 
     render() {
+        if (true === this.state.auth.loggedIn) {
+            return (
+                <User name={this.state.auth.name} token={this.state.auth.token}/>
+            );
+        }
         return (
-            <div className="login">Login form</div>
+            <LoginForm submitPath={this.state.path + 'auth/login'} callback={this.login} />
         );
     }
 }

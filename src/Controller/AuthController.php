@@ -19,35 +19,43 @@ class AuthController extends BaseController
      * @Route(
      *     "/auth/login",
      *     name="auth.login",
-     *     methods={"POST"}
+     *     methods={"POST", "GET"}
      *     )
      */
-    public function login(Request $request): Response
+    public function login(Request $request): JsonResponse
     {
-        if ((false === $request->request->has('_username')) || (false === $request->request->has('_password'))) {
-            throw new Exception('Invalid call to login');
-        }
-        $redirect = null;
-        if (true === $request->request->has('_target_path')) {
-            $redirect =  $request->request->get('_target_path');
-            //@todo check for illegal path
-        }
-        $result = $this->authenticationService->login($request->request->get('_username'),$request->request->get('_password'));
-        if ($result === null) {
-            throw new Exception('Invalid username or password');
+        if ('POST' === $request->getMethod()) {
+            $body = json_decode($request->getContent(), true);
+            if (false === $body) {
+                return $this->returnJsonErrorResponse(Response::HTTP_UNAUTHORIZED, 'Invalid call to login');
+            }
+            if ((false === array_key_exists('_username', $body)) || (false ===array_key_exists('_password', $body))) {
+                return $this->returnJsonErrorResponse(Response::HTTP_UNAUTHORIZED, 'Invalid call to login (missing data)');
+            }
+            $redirect = null;
+            if (true === $request->request->has('_target_path')) {
+                $redirect =  $request->request->get('_target_path');
+                //@todo check for illegal path
+            }
+
+            $email = $body['_username'];
+            $password = $body['_password'];
+            $token = $this->authenticationService->login($email, $password);
+            if (null === $token) {
+                $message = 'Invalid username or password';
+                return $this->returnJsonErrorResponse(Response::HTTP_UNAUTHORIZED, $message);
+            }
+        } else {
+            $email = 'some known user';
+            $token = $this->authenticationService->getStoredClientAccessToken();
         }
 
-        $response = new Response();
-        $response->headers->add(['X-ACCESS-TOKEN', $result->toString()]);
-        $response->isRedirect($redirect);
-        $response->setStatusCode(RESPONSE::HTTP_FOUND);
-        return $response;
-
-//        return new JsonResponse(
-//            [
-//                'token' => $result->toString(),
-//                'content' => implode(', ', $request->request->keys()),
-//            ]
-//        );
+        return new JsonResponse(
+            [
+                'token' => (null !== $token) ? $token->toString() : null,
+                'loggedIn' => (null !== $token),
+                'name' => $email,
+            ]
+        );
     }
 }

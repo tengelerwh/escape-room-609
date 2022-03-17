@@ -8,13 +8,14 @@ use App\DomainModel\Authentication\AuthenticationService;
 use App\DomainModel\Uuid;
 use Psr\Log\LoggerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
 
 abstract class BaseController extends AbstractController
 {
     protected AuthenticationService $authenticationService;
 
-    private LoggerInterface $logger;
+    protected LoggerInterface $logger;
 
     public function __construct(
         AuthenticationService $authenticationService,
@@ -22,6 +23,14 @@ abstract class BaseController extends AbstractController
     ) {
         $this->logger = $logger;
         $this->authenticationService = $authenticationService;
+    }
+
+    protected function returnJsonErrorResponse(int $status, string $message): JsonResponse
+    {
+        $data = [
+            'message' => $message,
+        ];
+        return new JsonResponse($data, Response::HTTP_UNAUTHORIZED);
     }
 
     protected function renderLoginForm(string $redirect): Response
