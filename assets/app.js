@@ -13,7 +13,10 @@ import './styles/app.css';
 
 import React from 'react';
 import ReactDOM from 'react-dom';
-import LoginForm from './js/components/LoginForm';
+import Login from './js/components/Login';
+import eventDispatcher from './js/components/Event/EventDispatcher';
+import Game from './js/components/Game';
+import GameList from './js/components/GameList';
 import User from './js/components/User';
 
 class App extends React.Component {
@@ -21,37 +24,47 @@ class App extends React.Component {
         super();
 
         this.state = {
-            path: 'http://localhost:9081/',
             auth: {
-                'token': null,
-                'loggedIn': false,
-                'name': ''
+                token: null,
+                loggedIn: false
+            },
+            game: {
+                started: false
             }
         };
-        this.login = this.login.bind(this);
     }
 
     componentDidMount() {
-        // fetch(this.state.path + 'auth/login')
-        //     .then(response => response.json())
-        //     .then(authData => {
-        //         this.setState({auth: authData});
-        //     });
+        eventDispatcher.on("login.success", (data) => {
+            console.log('App: message login.success');
+            let newState = {
+                token: data.token,
+                loggedIn: data.loggedIn,
+            };
+            this.setState({auth: newState});
+        });
     }
 
-    login(data) {
-        console.log('App login data returned' + data.name);
-        this.setState({auth: data});
+    componentWillUnmount() {
+        eventDispatcher.remove('login.success');
+        eventDispatcher.remove('login.error');
     }
 
     render() {
+        let page;
         if (true === this.state.auth.loggedIn) {
-            return (
-                <User name={this.state.auth.name} token={this.state.auth.token}/>
-            );
+            if (true === this.state.game.started) {
+                page = <Game/>
+            } else {
+                page = <GameList/>
+            }
         }
+
         return (
-            <LoginForm submitPath={this.state.path + 'auth/login'} callback={this.login} />
+            <div>
+                <Login  />
+                {page}
+            </div>
         );
     }
 }
