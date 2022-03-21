@@ -16,11 +16,12 @@ class GameListItem extends Component {
 
     render() {
         return (
-            <div id={this.props.id} className={`gameListItem ${this.props.status}`} onClick={this.handleClick} >
-                <div className="id">{this.props.id}</div>
-                <div className="status">{this.props.status}</div>
-                <div className="timeLeft">{this.props.timeLeft}</div>
-            </div>
+            <tr id={this.props.id} className={`gameListItem ${this.props.status}`} onClick={this.handleClick} >
+                <td className="num">{this.props.count}</td>
+                <td className="id">{this.props.id}</td>
+                <td className="status">{this.props.status}</td>
+                <td className="timeLeft">{this.props.timeLeft}</td>
+            </tr>
         )
     }
 }

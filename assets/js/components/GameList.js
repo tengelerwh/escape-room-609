@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import eventDispatcher from './Event/EventDispatcher';
 import Client from './Client';
 import GameListItem from './GameListItem';
+import Table from 'react-bootstrap/Table';
 
 class GameList extends Component {
     constructor(props) {
@@ -30,11 +31,22 @@ class GameList extends Component {
     }
 
     render() {
+        let row = 1;
         return (
             <>
-                <ul className="gameList">
-                    {this.state.list.map(item => (<GameListItem key={item.uuid} id={item.uuid} status={item.status} timeLeft={item.timeLeft} />))}
-                </ul>
+                <Table responsive="sm" className="gameList">
+                    <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>Uuid</th>
+                        <th>Status</th>
+                        <th>Time left</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    {this.state.list.map(item => (<GameListItem key={item.uuid} count={row++} id={item.uuid} status={item.status} timeLeft={item.timeLeft} />))}
+                    </tbody>
+                </Table>
             </>
         )
     }
