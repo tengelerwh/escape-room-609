@@ -9,13 +9,13 @@ doctrine:
                 # This will be the connection used by the default entity manager
                 url: '%env(resolve:DATABASE_URL)%'
 #                driver: 'pdo_pgsql'
-                server_version: '10.5'
+                server_version: 'mariadb-10.5.12'
                 charset: UTF8
             migrations:
                 # This will be the connection used for playing the migrations
                 url: '%env(resolve:DATABASE_MIGRATIONS_URL)%'
 #                driver: 'pdo_pgsql'
-                server_version: '10.5'
+                server_version: 'mariadb-10.5.12'
                 charset: UTF8
 
         # IMPORTANT: You MUST configure your server version,

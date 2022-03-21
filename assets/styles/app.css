@@ -8,48 +8,48 @@ body {
     color: brown;
 }
 
-.gameList div.gameListItem {
-    display: block;
-    border: 1px solid black;
-    color: black;
-    background-color: lightgray;
-}
+/*.gameList .gameListItem {*/
+/*    display: block;*/
+/*    border: 1px solid black;*/
+/*    color: black;*/
+/*    background-color: lightgray;*/
+/*}*/
 
 
-.gameList div.selected {
-    font-size: 1.2em;
-    font-weight: bold;
-}
+/*.gameList .selected {*/
+/*    font-size: 1.2em;*/
+/*    font-weight: bold;*/
+/*}*/
 
-.gameList div.pending {
-    background-color: lightseagreen;
-}
+/*.gameList .pending {*/
+/*    background-color: lightseagreen;*/
+/*}*/
 
-.gameList div.ended {
-    background-color: lightcoral;
-}
+/*.gameList .ended {*/
+/*    background-color: lightcoral;*/
+/*}*/
 
-.gameList div.waiting {
-    background-color: lightgreen;
-}
+/*.gameList .waiting {*/
+/*    background-color: lightgreen;*/
+/*}*/
 
-.gameList div:hover {
-    background-color: darkgray;
-    text-decoration: none;
-}
+/*.gameList div:hover {*/
+/*    background-color: darkgray;*/
+/*    text-decoration: none;*/
+/*}*/
 
-.gameList div.gameListItem div {
-    display: inline-block;
-}
+/*.gameList .gameListItem div {*/
+/*    display: inline-block;*/
+/*}*/
 
-.gameList div.gameListItem div.id {
-    min-width: 150px;
-}
+/*.gameList div.gameListItem div.id {*/
+/*    min-width: 150px;*/
+/*}*/
 
-.gameList div.gameListItem div.status {
-    min-width: 100px;
-}
+/*.gameList div.gameListItem div.status {*/
+/*    min-width: 100px;*/
+/*}*/
 
-.gameList div.gameListItem div.timeLeft {
-    min-width: 100px;
-}
+/*.gameList div.gameListItem div.timeLeft {*/
+/*    min-width: 100px;*/
+/*}*/
