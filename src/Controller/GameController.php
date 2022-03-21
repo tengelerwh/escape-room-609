@@ -7,6 +7,7 @@ namespace App\Controller;
 use App\DomainModel\Authentication\AuthenticationService;
 use App\DomainModel\Game\GameService;
 use Psr\Log\LoggerInterface;
+use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
@@ -26,25 +27,45 @@ class GameController extends BaseController
 
     /**
      * @Route(
-     *     "/",
-     *     name="home",
+     *     "/list",
+     *     name="game.list",
      *     methods={"GET"}
      *     )
-     * @return Response
+     * @return JsonResponse
      */
-    public function index(Request $request): Response
+    public function list(Request $request): JsonResponse
     {
-        $currentUrl = $this->generateUrl('home', $request->query->all());
-//        $clientAccessToken = $this->authenticationService->getClientAccessTokenFromRequest($request);
-//        if (false === $this->authenticationService->isloggedIn()) {
-//            return $this->renderLoginForm($currentUrl);
-//        }
-//
-//        $game = $this->gameService->getCurrentGame();
-//        $timeLeft = $this->gameService->getTimeLeft($game);
+        if (false === $this->isValidRequest($request)) {
+            return $this->returnJsonErrorResponse(Response::HTTP_UNAUTHORIZED, 'Not logged in');
+        }
 
-        return $this->render('game/index.html.twig', [
-            'controller_name' => 'GameController',
-        ]);
+        return new JsonResponse(
+            [
+                'games' => [
+                    '5f8dc0a9-9fca-4a9f-a87c-27d07a667b0d' => [
+                        'status' => 'ended',
+                        'timeLeft' => 0,
+                    ],
+                    '188696ec-d58d-46dc-81a3-96b6d0495a6a' => [
+                        'status' => 'waiting',
+                        'timeLeft' => 3600,
+
+                    ],
+                    '5652a9c5-5ac2-4cc7-91a7-96231f50fbd1' => [
+                        'status' => 'waiting',
+                        'timeLeft' => 3600,
+                    ],
+                    '068c119-ea2a-4cf3-bf1c-762e0ac11d02' => [
+                        'status' => 'ended',
+                        'timeLeft' => 0,
+
+                    ],
+                    'a4144737-0343-44ab-8d16-73d4a88b8b44' => [
+                        'status' => 'pending',
+                        'timeLeft' => 3000,
+                    ],
+                ],
+            ]
+        );
     }
 }

@@ -8,7 +8,8 @@ use Symfony\Component\HttpFoundation\Request;
 
 interface AuthenticationServiceInterface
 {
-    public function getClientAccessTokenFromRequest(Request $request): ?ClientAccessToken;
     public function isLoggedIn(): bool;
     public function login(string $email, string $password): ?ClientAccessToken;
+    public function hasValidAccessToken(array $clientIdentification, ?ClientAccessToken $accessToken): bool;
+    public function persistClient(array $clientIdentification, ClientAccessToken $accessToken): void;
 }

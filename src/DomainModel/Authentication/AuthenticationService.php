@@ -4,8 +4,6 @@ declare(strict_types=1);
 
 namespace App\DomainModel\Authentication;
 
-use Symfony\Component\HttpFoundation\Request;
-
 class AuthenticationService implements AuthenticationServiceInterface
 {
     private ?ClientAccessToken $clientAccessToken = null;
@@ -13,6 +11,7 @@ class AuthenticationService implements AuthenticationServiceInterface
     public function login(string $email, string $password): ?ClientAccessToken
     {
         //@todo call apiClient to handle login
+        // if already logged in, generate a new access token
         $this->clientAccessToken = ClientAccessToken::create();
         return $this->clientAccessToken;
     }
@@ -25,17 +24,20 @@ class AuthenticationService implements AuthenticationServiceInterface
         return true;
     }
 
-    public function getClientAccessTokenFromRequest(Request $request): ?ClientAccessToken
+    public function hasValidAccessToken(array $clientIdentification, ?ClientAccessToken $accessToken): bool
     {
-        if (false === $request->headers->has('X-ACCESS-TOKEN')) {
-            return null;
+        if (null === $accessToken) {
+            return false;
         }
-        $this->clientAccessToken = ClientAccessToken::fromString($request->headers->get('X-ACCESS-TOKEN'));
-        return $this->clientAccessToken;
+
+        // @todo find access token and match with clientIdentification
+        $userData = sha1(json_encode($clientIdentification));
+
+        return true;
     }
 
-    public function getStoredClientAccessToken(): ?ClientAccessToken
+    public function persistClient(array $clientIdentification, ClientAccessToken $accessToken): void
     {
-        return $this->clientAccessToken;
+        $userData = sha1(json_encode($clientIdentification));
     }
 }

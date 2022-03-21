@@ -5,10 +5,12 @@ declare(strict_types=1);
 namespace App\Controller;
 
 use App\DomainModel\Authentication\AuthenticationService;
+use App\DomainModel\Authentication\ClientAccessToken;
 use App\DomainModel\Uuid;
 use Psr\Log\LoggerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
 abstract class BaseController extends AbstractController
@@ -51,5 +53,39 @@ abstract class BaseController extends AbstractController
         $headers = array_merge(['X-CLIENT-TOKEN' => Uuid::create()->toString()], $headers);
         $response = new Response(null, Response::HTTP_OK, $headers);
         return $this->render($view, $parameters, $response);
+    }
+
+    protected function getRequestIdentificationData(Request $request): array
+    {
+        $data = [
+            'ip' => $request->getClientIp(),
+            'language' => $request->getPreferredLanguage(),
+            'userInfo' => $request->getUserInfo(),
+        ];
+        return $data;
+    }
+
+    protected function getClientAccessTokenFromRequest(Request $request): ?ClientAccessToken
+    {
+        if (false === $request->headers->has('X-ACCESS-TOKEN')) {
+            return null;
+        }
+        return ClientAccessToken::fromString($request->headers->get('X-ACCESS-TOKEN'));
+    }
+
+    protected function isValidRequest(Request $request): bool
+    {
+        $token = $this->getClientAccessTokenFromRequest($request);
+        if (null === $token) {
+            return false;
+        }
+        if ($this->authenticationService->hasValidAccessToken(
+            $this->getRequestIdentificationData($request),
+            $token
+        )) {
+            return true;
+        }
+
+        return false;
     }
 }
