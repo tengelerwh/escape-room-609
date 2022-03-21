@@ -27,7 +27,22 @@ class GameController extends BaseController
 
     /**
      * @Route(
-     *     "/list",
+     *     "/",
+     *     name="home",
+     *     methods={"GET"}
+     *     )
+     * @return Response
+     */
+    public function index(): Response
+    {
+        return $this->render('game/index.html.twig', [
+            'controller_name' => 'GameController',
+        ]);
+    }
+
+    /**
+     * @Route(
+     *     "/game/list",
      *     name="game.list",
      *     methods={"GET"}
      *     )
@@ -42,25 +57,28 @@ class GameController extends BaseController
         return new JsonResponse(
             [
                 'games' => [
-                    '5f8dc0a9-9fca-4a9f-a87c-27d07a667b0d' => [
+                     [
+                        'uuid' => '5f8dc0a9-9fca-4a9f-a87c-27d07a667b0d',
                         'status' => 'ended',
                         'timeLeft' => 0,
                     ],
-                    '188696ec-d58d-46dc-81a3-96b6d0495a6a' => [
-                        'status' => 'waiting',
-                        'timeLeft' => 3600,
-
-                    ],
-                    '5652a9c5-5ac2-4cc7-91a7-96231f50fbd1' => [
+                    [
+                        'uuid' => '188696ec-d58d-46dc-81a3-96b6d0495a6a',
                         'status' => 'waiting',
                         'timeLeft' => 3600,
                     ],
-                    '068c119-ea2a-4cf3-bf1c-762e0ac11d02' => [
+                    [
+                        'uuid' => '5652a9c5-5ac2-4cc7-91a7-96231f50fbd1',
+                        'status' => 'waiting',
+                        'timeLeft' => 3600,
+                    ],
+                    [
+                        'uuid' => '068c119-ea2a-4cf3-bf1c-762e0ac11d02',
                         'status' => 'ended',
                         'timeLeft' => 0,
-
                     ],
-                    'a4144737-0343-44ab-8d16-73d4a88b8b44' => [
+                    [
+                        'uuid' => 'a4144737-0343-44ab-8d16-73d4a88b8b44',
                         'status' => 'pending',
                         'timeLeft' => 3000,
                     ],

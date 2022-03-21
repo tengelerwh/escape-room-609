@@ -43,12 +43,14 @@ docker exec ${dbContainerName} mysql -e "${command}"
 bin/docker composer install --no-interaction --no-progress --no-scripts --no-suggest --optimize-autoloader
 
 # Run database migrations
-bin/docker bin/console doctrine:migrations:migrate --no-interaction -db=migrations
-bin/docker bin/console doctrine:migrations:migrate --env=test --no-interaction -db=migrations
+bin/docker bin/console doctrine:migrations:migrate --no-interaction --conn=migrations
+bin/docker bin/console doctrine:migrations:migrate --env=test --no-interaction --conn=migrations
 
 # Install NodeJs encore
-bin/docker yarn add @babel/preset-react --dev
+bin/docker yarn cache clean
 bin/docker yarn add react react-dom prop-types
+bin/docker yarn add react-bootstrap bootstrap
+bin/docker yarn add @babel/preset-react@^7.0.0 --dev
 
 # run init only once
 #bin/docker yarn init

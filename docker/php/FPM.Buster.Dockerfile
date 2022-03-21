@@ -69,12 +69,14 @@ RUN alias composer='XDEBUG_MODE=off \composer'
 RUN rm /etc/localtime
 RUN ln -s /usr/share/zoneinfo/Europe/Amsterdam /etc/localtime
 
-RUN curl -fsSL https://deb.nodesource.com/setup_17.x | bash -
-RUN apt-get install -y nodejs
+#RUN curl -fsSL https://deb.nodesource.com/setup_17.x | bash -
+#RUN apt-get install -y nodejs
+RUN curl -fsSL https://deb.nodesource.com/setup_17.x | bash -  \
+    && apt-get install -yq nodejs build-essential
 
 RUN npm install npm@${nodejsVersion} -g \
-    && npm install n --global \
-    && n latest \
+#    && npm install n --global \
+#    && n latest \
     && npm install --global yarn \
     && npm install --global --save-dev webpack webpack-cli
 
