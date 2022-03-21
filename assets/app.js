@@ -7,9 +7,7 @@
 
 // any CSS you import will output into a single css file (app.css in this case)
 import './styles/app.css';
-
-// start the Stimulus application
-// import './bootstrap';
+// import 'bootstrap/dist/css/bootstrap.min.css';
 
 import React from 'react';
 import ReactDOM from 'react-dom';
@@ -54,9 +52,9 @@ class App extends React.Component {
         let page;
         if (true === this.state.auth.loggedIn) {
             if (true === this.state.game.started) {
-                page = <Game/>
+                page = <Game accessToken={this.state.auth.token} />
             } else {
-                page = <GameList/>
+                page = <GameList accessToken={this.state.auth.token} />
             }
         }
 

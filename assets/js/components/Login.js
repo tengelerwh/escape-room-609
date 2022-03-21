@@ -48,7 +48,7 @@ class Login extends Component {
             '_password': this.passwordElement.current.value.toString()
         };
 
-        Client.sendRequest(data, 'auth/login', 'login');
+        Client.post(data, 'auth/login', 'login');
     }
 
     render() {
@@ -61,7 +61,7 @@ class Login extends Component {
             <div>
                 <div className="error">{this.state.error}</div>
                 <div className="loginForm">
-                    <input ref={this.usernameElement} name="username" placeholder="your.email@your.domain.nl"/>
+                    <input ref={this.usernameElement} name="username" placeholder="your.email@your.domain.nl" value="wouter@test.nl" />
                     <input ref={this.passwordElement} type="password" name="password" />
                     <button onClick={this.handleSubmit}>Login</button>
                 </div>
