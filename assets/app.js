@@ -41,11 +41,21 @@ class App extends React.Component {
             };
             this.setState({auth: newState});
         });
+        eventDispatcher.on("login.refresh.success", (data) => {
+            console.log('App: message login.refresh.success');
+            let newState = {
+                token: data.token,
+                loggedIn: data.loggedIn,
+            };
+            this.setState({auth: newState});
+        });
     }
 
     componentWillUnmount() {
         eventDispatcher.remove('login.success');
         eventDispatcher.remove('login.error');
+        eventDispatcher.remove('login.refresh.success');
+        eventDispatcher.remove('login.refresh.error');
     }
 
     render() {

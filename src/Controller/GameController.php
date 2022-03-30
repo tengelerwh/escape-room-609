@@ -54,8 +54,11 @@ class GameController extends BaseController
             return $this->returnJsonErrorResponse(Response::HTTP_UNAUTHORIZED, 'Not logged in');
         }
 
+        $client = $this->getClientFromRequest($request);
+
         return new JsonResponse(
             [
+                'client' => $client,
                 'games' => [
                      [
                         'uuid' => '5f8dc0a9-9fca-4a9f-a87c-27d07a667b0d',

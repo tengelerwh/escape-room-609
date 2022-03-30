@@ -8,6 +8,7 @@ class Login extends Component {
         super(props);
         console.log('Login: constructor');
         this.state = {
+            refresh: null,
             token: null,
             loggedIn: false,
             name: '',
@@ -15,7 +16,9 @@ class Login extends Component {
         }
         this.usernameElement = createRef();
         this.passwordElement = createRef();
+        this.refreshCount = 0;
 
+        this.state.refresh = localStorage.getItem('refresh');
         this.handleSubmit = this.handleSubmit.bind(this);
     }
 
@@ -27,18 +30,40 @@ class Login extends Component {
         eventDispatcher.on("login.success", (data) => {
             console.log('Login: message login.success' + JSON.stringify(data));
             let newState = {
+                refresh: data.refresh,
                 token: data.token,
                 loggedIn: data.loggedIn,
                 name: data.name,
                 error: ''
             };
+            // persist refresh token only
+            localStorage.setItem('refresh', data.refresh);
             this.setState(newState);
+        });
+        eventDispatcher.on("login.refresh.success", (data) => {
+            console.log('Login: message login.refresh.success' + JSON.stringify(data));
+            let newState = {
+                refresh: data.refresh,
+                token: data.token,
+                loggedIn: data.loggedIn,
+                name: data.name,
+                error: ''
+            };
+            // persist refresh token only
+            localStorage.setItem('refresh', data.refresh);
+            this.setState(newState);
+        });
+        eventDispatcher.on("login.refresh.error", (error) => {
+            console.log('Login Refresh : message login.refresh.error');
+            this.setState({token: null, loggedIn: false, name: '', error: error})
         });
     }
 
     componentWillUnmount() {
         eventDispatcher.remove('login.success');
         eventDispatcher.remove('login.error');
+        eventDispatcher.remove('login.refresh.success');
+        eventDispatcher.remove('login.refresh.error');
     }
 
     handleSubmit(e) {
@@ -51,11 +76,29 @@ class Login extends Component {
         Client.post(data, 'auth/login', 'login');
     }
 
+    refreshToken() {
+        this.refreshCount++;
+        let data = {
+            'refresh': this.state.refresh
+        }
+        if (this.refreshCount < 2) {
+            Client.post(data, 'auth/refresh', 'login.refresh');
+        }
+    }
+
     render() {
         if (true === this.state.loggedIn) {
             return (
                 <User name={this.state.name} token={this.state.token}/>
             );
+        } else {
+            // do we have a refresh token
+            if (null !== this.state.refresh) {
+                this.refreshToken();
+                return (
+                    <div>Refreshing...</div>
+                );
+            }
         }
         return (
             <div>

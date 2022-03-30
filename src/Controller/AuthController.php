@@ -4,11 +4,7 @@ declare(strict_types=1);
 
 namespace App\Controller;
 
-use App\DomainModel\Authentication\AuthenticationService;
-use App\DomainModel\Game\GameService;
-use App\DomainModel\Uuid;
-use Exception;
-use Psr\Log\LoggerInterface;
+use App\DomainModel\Authentication\RefreshToken;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Annotation\Route;
@@ -25,29 +21,74 @@ class AuthController extends BaseController
      */
     public function login(Request $request): JsonResponse
     {
-        $body = json_decode($request->getContent(), true);
-        if (false === $body) {
+        try {
+            $content = $this->parseRequestContent($request);
+        } catch (InvalidContentException $exception) {
             return $this->returnJsonErrorResponse(Response::HTTP_UNAUTHORIZED, 'Invalid call to login');
         }
-        if ((false === array_key_exists('_username', $body)) || (false === array_key_exists('_password', $body))) {
+
+        if ((false === array_key_exists('_username', $content)) || (false === array_key_exists('_password', $content))) {
             return $this->returnJsonErrorResponse(Response::HTTP_UNAUTHORIZED, 'Invalid call to login (missing data)');
         }
 
-        $email = $body['_username'];
-        $password = $body['_password'];
-        $token = $this->authenticationService->login($email, $password);
-        if (null === $token) {
+        $email = $content['_username'];
+        $password = $content['_password'];
+        $client = $this->authenticationService->login($email, $password);
+        if (null === $client) {
             $message = 'Invalid username or password';
             return $this->returnJsonErrorResponse(Response::HTTP_UNAUTHORIZED, $message);
         }
 
-        $this->authenticationService->persistClient($this->getRequestIdentificationData($request), $token);
+        $this->authenticationService->persistClient($client);
 
         return new JsonResponse(
             [
-                'token' => $token->toString(),
-                'loggedIn' => (null !== $token),
-                'name' => $email,
+                'refresh' => $client->getRefreshToken()->toString(),
+                'token' => $client->getAccessToken()->toString(),
+                'loggedIn' => true,
+                'name' => $client->getUser()->getName(),
+            ]
+        );
+    }
+
+    /**
+     * @Route(
+     *     "/auth/refresh",
+     *     name="auth.refresh",
+     *     methods={"POST"}
+     *     )
+     *
+     * Generate a new access token for the client. Called when already loggedIn but reload of page is triggered
+     */
+    public function refresh(Request $request): JsonResponse
+    {
+        try {
+            $content = $this->parseRequestContent($request);
+        } catch (InvalidContentException $exception) {
+            return $this->returnJsonErrorResponse(Response::HTTP_UNAUTHORIZED, 'Invalid call to refresh');
+        }
+
+        if (false === array_key_exists('refresh', $content)) {
+            return $this->returnJsonErrorResponse(Response::HTTP_UNAUTHORIZED, 'Invalid call to refresh (missing data)');
+        }
+        $refreshToken = RefreshToken::fromString($content['refresh']);
+        $client = $this->authenticationService->refreshClient($refreshToken);
+        if (null === $client) {
+            return new JsonResponse(
+                [
+                    'refresh' => null,
+                    'token' => null,
+                    'loggedIn' => false,
+                    'name' => '',
+                ]
+            );        }
+
+        return new JsonResponse(
+            [
+                'refresh' => $client->getRefreshToken()->toString(),
+                'token' => $client->getAccessToken()->toString(),
+                'loggedIn' => true,
+                'name' => $client->getUser()->getName(),
             ]
         );
     }

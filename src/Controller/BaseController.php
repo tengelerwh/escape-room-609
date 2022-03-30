@@ -6,6 +6,7 @@ namespace App\Controller;
 
 use App\DomainModel\Authentication\AuthenticationService;
 use App\DomainModel\Authentication\ClientAccessToken;
+use App\DomainModel\Authentication\ClientData;
 use App\DomainModel\Uuid;
 use Psr\Log\LoggerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -35,17 +36,18 @@ abstract class BaseController extends AbstractController
         return new JsonResponse($data, Response::HTTP_UNAUTHORIZED);
     }
 
-    protected function renderLoginForm(string $redirect): Response
+    /**
+     * @param Request $request
+     * @return array
+     * @throws InvalidContentException
+     */
+    protected function parseRequestContent(Request $request): array
     {
-        $error = '';
-        $lastUserName = '';
-
-        return $this->render('auth/login.html.twig', [
-            'controller_name' => 'AuthController',
-            'lastUsername' => $lastUserName,
-            'redirect' => $redirect,
-            'error' => $error,
-        ]);
+        $body = json_decode($request->getContent(), true);
+        if (false === $body) {
+            throw new InvalidContentException('Invalid data');
+        }
+        return $body;
     }
 
     protected function renderWithHeaders(string $view, array $parameters = [], array $headers = []): Response
@@ -61,6 +63,8 @@ abstract class BaseController extends AbstractController
             'ip' => $request->getClientIp(),
             'language' => $request->getPreferredLanguage(),
             'userInfo' => $request->getUserInfo(),
+            'userAgent' => $request->headers->get('user-agent'),
+            'contentType' => $request->headers->get('content-type'),
         ];
         return $data;
     }
@@ -73,16 +77,22 @@ abstract class BaseController extends AbstractController
         return ClientAccessToken::fromString($request->headers->get('X-ACCESS-TOKEN'));
     }
 
+    protected function getClientFromRequest(Request $request): ?ClientData
+    {
+        $accessToken = $this->getClientAccessTokenFromRequest($request);
+        if (null === $accessToken) {
+            return null;
+        }
+        return $this->authenticationService->getClientByAccessToken($accessToken, $this->getRequestIdentificationData($request));
+    }
+
     protected function isValidRequest(Request $request): bool
     {
-        $token = $this->getClientAccessTokenFromRequest($request);
-        if (null === $token) {
+        $accessToken = $this->getClientAccessTokenFromRequest($request);
+        if (null === $accessToken) {
             return false;
         }
-        if ($this->authenticationService->hasValidAccessToken(
-            $this->getRequestIdentificationData($request),
-            $token
-        )) {
+        if ($this->authenticationService->isValidAccessToken($accessToken)) {
             return true;
         }
 
