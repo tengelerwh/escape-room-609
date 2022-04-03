@@ -27,7 +27,8 @@ class App extends React.Component {
                 loggedIn: false
             },
             game: {
-                started: false
+                started: false,
+                id: null
             }
         };
     }
@@ -47,7 +48,16 @@ class App extends React.Component {
                 token: data.token,
                 loggedIn: data.loggedIn,
             };
+            // @todo if a game is active for this client, load game data
             this.setState({auth: newState});
+        });
+        eventDispatcher.on("game.started", (data) => {
+            console.log('App: message game.started: ' + data.id);
+            let newState = {
+                started: true,
+                id: data.id,
+            };
+            this.setState({game: newState});
         });
     }
 
@@ -62,7 +72,7 @@ class App extends React.Component {
         let page;
         if (true === this.state.auth.loggedIn) {
             if (true === this.state.game.started) {
-                page = <Game accessToken={this.state.auth.token} />
+                page = <Game accessToken={this.state.auth.token} gameId={this.state.game.id}/>
             } else {
                 page = <GameList accessToken={this.state.auth.token} />
             }

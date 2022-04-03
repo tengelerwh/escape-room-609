@@ -1,4 +1,5 @@
 import React, { Component } from 'react';
+import eventDispatcher from './Event/EventDispatcher';
 
 class GameListItem extends Component {
     constructor(props) {
@@ -13,6 +14,7 @@ class GameListItem extends Component {
         e.preventDefault();
         console.log('Selected item: ' + this.props.id);
         e.target.className = e.target.className + " selected";
+        eventDispatcher.dispatch('game.started', {id: this.props.id});
     }
 
     render() {
