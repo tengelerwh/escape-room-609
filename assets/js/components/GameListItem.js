@@ -1,16 +1,17 @@
 import React, { Component } from 'react';
 
 class GameListItem extends Component {
-    // constructor(props) {
-    //     super(props);
-    // }
+    constructor(props) {
+        super(props);
+        this.handleClick = this.handleClick.bind(this);
+    }
     //
     // componentDidMount() {
     // }
 
     handleClick(e) {
         e.preventDefault();
-        console.log('Selected item: ' + e.target.id);
+        console.log('Selected item: ' + this.props.id);
         e.target.className = e.target.className + " selected";
     }
 

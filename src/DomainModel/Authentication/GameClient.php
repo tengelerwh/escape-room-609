@@ -131,6 +131,7 @@ class GameClient implements DomainObject, JsonSerializable
 
     public function setUser(User $user): void
     {
+        $this->userToken = $user->getUserToken();
         $this->user = $user;
     }
 
@@ -152,6 +153,22 @@ class GameClient implements DomainObject, JsonSerializable
     public function getExpiresAtUtc(): DateTime
     {
         return $this->expiresAtUtc;
+    }
+
+    public function resetExpiration(): DateTime
+    {
+        $expiresAt = new DateTime('now', new DateTimeZone('UTC'));
+        $expiresAt->add(new DateInterval('PT1H'));
+        $this->expiresAtUtc = $expiresAt;
+
+        return $this->expiresAtUtc;
+    }
+
+    public function isExpired(): bool
+    {
+        $now = new DateTime('now', new DateTimeZone('UTC'));
+
+        return $now > $this->getExpiresAtUtc();
     }
 
     public function jsonSerialize(): array

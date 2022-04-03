@@ -21,12 +21,12 @@ class AuthenticationService implements AuthenticationServiceInterface
         $this->logger = $logger;
     }
 
-    public function login(string $email, string $password): ?GameClient
+    public function login(string $email, string $password, array $clientIdentification): ?GameClient
     {
         //@todo call apiClient to handle login
         $user = User::create($email, $password, 'User name');
         // if already logged in, generate a new access token and refresh token
-        $client = GameClient::new([]);
+        $client = GameClient::new($clientIdentification);
         $client->setUser($user);
 
         $this->currentClient = $client;
@@ -59,13 +59,7 @@ class AuthenticationService implements AuthenticationServiceInterface
         $this->clientRepository->save($client);
     }
 
-    public function isValidClient(GameClient $client): bool
-    {
-        // @todo implement validation
-        return true;
-    }
-
-    public function refreshClient(RefreshToken $refreshToken): ?GameClient
+    public function refreshClient(RefreshToken $refreshToken, array $clientIdentification): ?GameClient
     {
         $this->logger->debug(sprintf('RefreshClient: token %s', $refreshToken));
         $client = $this->clientRepository->findByRefreshToken($refreshToken);
@@ -75,8 +69,14 @@ class AuthenticationService implements AuthenticationServiceInterface
         }
 
         $this->logger->debug(sprintf('Client retrieved : %s', $client->toString()));
+
+        if (false === $this->matchClientIdentification($client, $clientIdentification)) {
+            return null;
+        }
+
         $client->setAccessToken(ClientAccessToken::create());
         $client->setRefreshToken(RefreshToken::create());
+        $client->resetExpiration();
         $this->persistClient($client);
 
         $this->currentClient = $client;
@@ -87,9 +87,31 @@ class AuthenticationService implements AuthenticationServiceInterface
     {
         $client = $this->clientRepository->findByAccessToken($accessToken);
 
-        // match client identification with stored version to make sure client is the same
-        $clientData = sha1(json_encode($clientIdentification));
+        if (false === $this->matchClientIdentification($client, $clientIdentification)) {
+            return null;
+        }
 
         return $client;
+    }
+
+    /**
+     * All elements in the client identification must match
+     *
+     * @param GameClient $client
+     * @param array $clientIdentification
+     * @return bool
+     */
+    public function matchClientIdentification(GameClient $client, array $clientIdentification): bool
+    {
+        $orgData = $client->getClientIdentification();
+        foreach ($orgData as $name => $item) {
+            if (false === array_key_exists($name, $clientIdentification)) {
+                return false;
+            }
+            if ($item !== $clientIdentification[$name]) {
+                return false;
+            }
+        }
+        return true;
     }
 }

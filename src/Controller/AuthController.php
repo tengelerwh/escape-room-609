@@ -33,7 +33,7 @@ class AuthController extends BaseController
 
         $email = $content['_username'];
         $password = $content['_password'];
-        $client = $this->authenticationService->login($email, $password);
+        $client = $this->authenticationService->login($email, $password, $this->getRequestIdentificationData($request));
         if (null === $client) {
             $message = 'Invalid username or password';
             return $this->returnJsonErrorResponse(Response::HTTP_UNAUTHORIZED, $message);
@@ -74,7 +74,7 @@ class AuthController extends BaseController
         }
         $this->logger->debug(sprintf('refreshToken: %s', $content['refresh']), ['app']);
         $refreshToken = RefreshToken::fromString($content['refresh']);
-        $client = $this->authenticationService->refreshClient($refreshToken);
+        $client = $this->authenticationService->refreshClient($refreshToken, $this->getRequestIdentificationData($request));
         if (null === $client) {
             return new JsonResponse(
                 [

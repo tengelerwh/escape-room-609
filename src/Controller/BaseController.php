@@ -84,7 +84,11 @@ abstract class BaseController extends AbstractController
         if (null === $accessToken) {
             return null;
         }
-        return $this->authenticationService->getClientByAccessToken($accessToken, $this->getRequestIdentificationData($request));
+        $client = $this->authenticationService->getClientByAccessToken($accessToken, $this->getRequestIdentificationData($request));
+        if ($client->isExpired()) {
+            return null;
+        }
+        return $client;
     }
 
     protected function isValidRequest(Request $request): bool
@@ -93,10 +97,10 @@ abstract class BaseController extends AbstractController
         if (null === $accessToken) {
             return false;
         }
-        if ($this->authenticationService->isValidAccessToken($accessToken)) {
-            return true;
+        if (false === $this->authenticationService->isValidAccessToken($accessToken)) {
+            return false;
         }
 
-        return false;
+        return true;
     }
 }
