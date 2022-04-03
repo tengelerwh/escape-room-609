@@ -33,6 +33,7 @@ abstract class BaseController extends AbstractController
         $data = [
             'message' => $message,
         ];
+        $this->logger->error(sprintf('Unauthorized (401): %s', $message), ['app']);
         return new JsonResponse($data, Response::HTTP_UNAUTHORIZED);
     }
 

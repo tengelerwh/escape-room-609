@@ -61,7 +61,7 @@ class GameClient implements DomainObject, JsonSerializable
     {
         $createdAt = new DateTimeImmutable('now', new DateTimeZone('UTC'));
         $expiresAt = DateTime::createFromImmutable($createdAt);
-        $expiresAt->add(new DateInterval('1 hour'));
+        $expiresAt->add(new DateInterval('PT1H'));
 
         return new static(
             null,
@@ -157,10 +157,10 @@ class GameClient implements DomainObject, JsonSerializable
     public function jsonSerialize(): array
     {
         return [
-            'id' => $this->id->toString(),
+            'id' => (null !== $this->id) ? $this->id->toString() : null,
             'accessToken' => $this->accessToken->toString(),
             'refreshToken' => $this->refreshToken->toString(),
-            'userToken' => $this->userToken ?? $this->userToken->toString(),
+            'userToken' => (null !== $this->userToken) ? $this->userToken->toString() : null,
             'createdAt' => $this->createdAtUtc->format('Y-m-d H:i:s'),
             'expiresAt' => $this->expiresAtUtc->format('Y-m-d H:i:s'),
             'clientIdentification' => $this->clientIdentification,

@@ -64,6 +64,7 @@ class AuthController extends BaseController
     {
         try {
             $content = $this->parseRequestContent($request);
+            $this->logger->debug(sprintf('refreshToken: %s', print_r($content, true)), ['app']);
         } catch (InvalidContentException $exception) {
             return $this->returnJsonErrorResponse(Response::HTTP_UNAUTHORIZED, 'Invalid call to refresh');
         }
@@ -71,6 +72,7 @@ class AuthController extends BaseController
         if (false === array_key_exists('refresh', $content)) {
             return $this->returnJsonErrorResponse(Response::HTTP_UNAUTHORIZED, 'Invalid call to refresh (missing data)');
         }
+        $this->logger->debug(sprintf('refreshToken: %s', $content['refresh']), ['app']);
         $refreshToken = RefreshToken::fromString($content['refresh']);
         $client = $this->authenticationService->refreshClient($refreshToken);
         if (null === $client) {
@@ -81,14 +83,16 @@ class AuthController extends BaseController
                     'loggedIn' => false,
                     'name' => '',
                 ]
-            );        }
+            );
+        }
 
+        $user = $client->getUser();
         return new JsonResponse(
             [
                 'refresh' => $client->getRefreshToken()->toString(),
                 'token' => $client->getAccessToken()->toString(),
                 'loggedIn' => true,
-                'name' => $client->getUser()->getName(),
+                'name' => (null !== $user) ? $user->getName() : 'unknown',
             ]
         );
     }

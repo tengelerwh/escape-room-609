@@ -5,15 +5,20 @@ declare(strict_types=1);
 namespace App\DomainModel\Authentication;
 
 use App\DomainModel\User\User;
+use Psr\Log\LoggerInterface;
 
 class AuthenticationService implements AuthenticationServiceInterface
 {
     private ?GameClient $currentClient;
     private ClientRepositoryInterface $clientRepository;
+    private LoggerInterface $logger;
 
-    public function __construct(ClientRepositoryInterface $clientRepository)
-    {
+    public function __construct(
+        ClientRepositoryInterface $clientRepository,
+        LoggerInterface $logger
+    ) {
         $this->clientRepository = $clientRepository;
+        $this->logger = $logger;
     }
 
     public function login(string $email, string $password): ?GameClient
@@ -49,7 +54,9 @@ class AuthenticationService implements AuthenticationServiceInterface
 
     public function persistClient(GameClient $client): void
     {
-       $this->clientRepository->save($client);
+        $this->logger->debug(sprintf('persistClient: %s', $client->toString()));
+
+        $this->clientRepository->save($client);
     }
 
     public function isValidClient(GameClient $client): bool
@@ -60,12 +67,14 @@ class AuthenticationService implements AuthenticationServiceInterface
 
     public function refreshClient(RefreshToken $refreshToken): ?GameClient
     {
+        $this->logger->debug(sprintf('RefreshClient: token %s', $refreshToken));
         $client = $this->clientRepository->findByRefreshToken($refreshToken);
 
         if (null === $client) {
             return null;
         }
 
+        $this->logger->debug(sprintf('Client retrieved : %s', $client->toString()));
         $client->setAccessToken(ClientAccessToken::create());
         $client->setRefreshToken(RefreshToken::create());
         $this->persistClient($client);

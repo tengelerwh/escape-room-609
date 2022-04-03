@@ -25,6 +25,8 @@ class Login extends Component {
     componentDidMount() {
         eventDispatcher.on("login.error", (error) => {
             console.log('Login: message login.error');
+            localStorage.removeItem('refresh');
+
             this.setState({token: null, loggedIn: false, name: '', error: error})
         });
         eventDispatcher.on("login.success", (data) => {
@@ -55,7 +57,9 @@ class Login extends Component {
         });
         eventDispatcher.on("login.refresh.error", (error) => {
             console.log('Login Refresh : message login.refresh.error');
-            this.setState({token: null, loggedIn: false, name: '', error: error})
+            localStorage.removeItem('refresh');
+
+            this.setState({refresh: null, token: null, loggedIn: false, name: '', error: error})
         });
     }
 
@@ -87,17 +91,21 @@ class Login extends Component {
     }
 
     render() {
+        console.log('loggedIn: '+ this.state.loggedIn);
         if (true === this.state.loggedIn) {
             return (
                 <User name={this.state.name} token={this.state.token}/>
             );
         } else {
             // do we have a refresh token
-            if (null !== this.state.refresh) {
+            console.log('refresh: ' + this.state.refresh);
+            if ('string' === typeof this.state.refresh) {
                 this.refreshToken();
                 return (
                     <div>Refreshing...</div>
                 );
+            } else {
+                console.log('refresh === null');
             }
         }
         return (
