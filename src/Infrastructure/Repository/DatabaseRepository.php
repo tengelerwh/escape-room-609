@@ -9,6 +9,8 @@ use Doctrine\DBAL\Connection;
 
 abstract class DatabaseRepository implements RepositoryInterface
 {
+    public const DATETIME_FORMAT = 'Y-m-d H:i:s';
+
     private Connection $connection;
 
     public function __construct(Connection $connection)

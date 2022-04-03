@@ -8,14 +8,20 @@ use App\DomainModel\User\User;
 
 class AuthenticationService implements AuthenticationServiceInterface
 {
-    private ?ClientData $currentClient;
+    private ?GameClient $currentClient;
+    private ClientRepositoryInterface $clientRepository;
 
-    public function login(string $email, string $password): ?ClientData
+    public function __construct(ClientRepositoryInterface $clientRepository)
+    {
+        $this->clientRepository = $clientRepository;
+    }
+
+    public function login(string $email, string $password): ?GameClient
     {
         //@todo call apiClient to handle login
         $user = User::create($email, $password, 'User name');
         // if already logged in, generate a new access token and refresh token
-        $client = ClientData::new([]);
+        $client = GameClient::new([]);
         $client->setUser($user);
 
         $this->currentClient = $client;
@@ -41,44 +47,39 @@ class AuthenticationService implements AuthenticationServiceInterface
         return true;
     }
 
-    public function persistClient(ClientData $client): void
+    public function persistClient(GameClient $client): void
     {
-       // @todo persist client
+       $this->clientRepository->save($client);
     }
 
-    public function isValidClient(ClientData $clientData): bool
+    public function isValidClient(GameClient $client): bool
     {
         // @todo implement validation
         return true;
     }
 
-    public function refreshClient(RefreshToken $refreshToken): ?ClientData
+    public function refreshClient(RefreshToken $refreshToken): ?GameClient
     {
-        // load client by refresh token
-        $client = ClientData::create([], ClientAccessToken::create()->toString(), RefreshToken::create()->toString());
+        $client = $this->clientRepository->findByRefreshToken($refreshToken);
 
         if (null === $client) {
             return null;
         }
 
-        $user = User::create('wouter@test.nl', 'test', 'Wouter refreshed');
-        // create new accessToken
-        // create new refresh token
-
-        $client->setUser($user);
+        $client->setAccessToken(ClientAccessToken::create());
+        $client->setRefreshToken(RefreshToken::create());
         $this->persistClient($client);
+
         $this->currentClient = $client;
         return $client;
     }
 
-    public function getClientByAccessToken(?ClientAccessToken $accessToken, array $clientIdentification): ?ClientData
+    public function getClientByAccessToken(?ClientAccessToken $accessToken, array $clientIdentification): ?GameClient
     {
-        // @todo load client
-
-        $client = ClientData::new($clientIdentification);
+        $client = $this->clientRepository->findByAccessToken($accessToken);
 
         // match client identification with stored version to make sure client is the same
-        $userData = sha1(json_encode($clientIdentification));
+        $clientData = sha1(json_encode($clientIdentification));
 
         return $client;
     }

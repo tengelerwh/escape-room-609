@@ -6,7 +6,7 @@ namespace App\Controller;
 
 use App\DomainModel\Authentication\AuthenticationService;
 use App\DomainModel\Authentication\ClientAccessToken;
-use App\DomainModel\Authentication\ClientData;
+use App\DomainModel\Authentication\GameClient;
 use App\DomainModel\Uuid;
 use Psr\Log\LoggerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -77,7 +77,7 @@ abstract class BaseController extends AbstractController
         return ClientAccessToken::fromString($request->headers->get('X-ACCESS-TOKEN'));
     }
 
-    protected function getClientFromRequest(Request $request): ?ClientData
+    protected function getClientFromRequest(Request $request): ?GameClient
     {
         $accessToken = $this->getClientAccessTokenFromRequest($request);
         if (null === $accessToken) {

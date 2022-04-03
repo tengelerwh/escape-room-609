@@ -21,15 +21,23 @@ final class Version20220321160648 extends AbstractMigration
     public function up(Schema $schema): void
     {
         $table = $schema->createTable('client');
-        $table->addColumn('token', Types::GUID)
+        $table->addColumn('uuid', Types::GUID)
             ->setNotnull(true);
-        $table->addColumn('createdAt', Types::DATETIMETZ_IMMUTABLE);
-        $table->addColumn('expiresAt', Types::DATETIMETZ_IMMUTABLE);
-        $table->addColumn('user', Types::STRING)
+        $table->addColumn('accessToken', Types::GUID)
+            ->setNotnull(true);
+        $table->addColumn('refreshToken', Types::GUID)
+            ->setNotnull(true);
+        $table->addColumn('userToken', Types::GUID)
+            ->setNotnull(false);
+        $table->addColumn('createdAtUtc', Types::DATETIMETZ_IMMUTABLE);
+        $table->addColumn('expiresAtUtc', Types::DATETIMETZ_IMMUTABLE);
+        $table->addColumn('clientData', Types::STRING)
             ->setLength(1024)
             ->setNotnull(true);
 
-        $table->setPrimaryKey(['token']);
+        $table->setPrimaryKey(['uuid']);
+        $table->addUniqueIndex(['accessToken'], 'idx_accessToken');
+        $table->addUniqueIndex(['refreshToken'], 'idx_refreshToken');
     }
 
     public function down(Schema $schema): void
