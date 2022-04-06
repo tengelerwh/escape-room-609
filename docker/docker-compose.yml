@@ -32,11 +32,14 @@ services:
       dockerfile: nginx/Dockerfile
     depends_on:
       - ${APP_NAME}-php-fpm
-    ports:
-      - "9081:80"
     volumes:
       - ..:/var/www/${APP_NAME}
     working_dir: /var/www/${APP_NAME}
+    labels:
+      - "traefik.enable=true"
+      #      - "traefik.http.routers.room-609.tls=true"
+      - "traefik.http.routers.room-609.rule=Host(`room-609.virtual-escape-room.nl`)"
+  #      - "traefik.http.routers.room-609.entrypoints=websecure"
 
   room-609-mariadb:
     container_name: ${APP_NAME}-mariadb
